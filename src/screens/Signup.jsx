@@ -7,18 +7,28 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { auth } from "../utils/firebase";
+import { auth, db } from "../utils/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
-export default function LoginScreen({ navigation }) {
+export default function SignupScreen({ navigation }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    await signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+  const handleSignup = async () => {
+    await createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
         // Signed in
         const user = userCredential.user;
         console.log("user data,", user);
+
+        const docRef = await addDoc(collection(db, "users"), {
+          email: email.toLowerCase().trim(),
+          uid: user.uid,
+          name: name.trim(),
+        });
+        console.log("docRef written", docRef.id);
+
         // ...
       })
       .catch((error) => {
@@ -38,11 +48,19 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Login Screen</Text>
+      <Text>Signup Screen</Text>
+
+      <MyTextInput
+        value={name}
+        placeholder={"Full name"}
+        onChange={(e) => {
+          setName(e);
+        }}
+      />
 
       <MyTextInput
         value={email}
-        placeholder={"Password"}
+        placeholder={"Email"}
         onChange={(e) => {
           setEmail(e);
         }}
@@ -55,13 +73,11 @@ export default function LoginScreen({ navigation }) {
           setPassword(e);
         }}
       />
-
       <View style={{ marginBottom: 20 }} />
-
       <MyBtn
-        text={"Login"}
+        text={"Signup"}
         onPress={() => {
-          handleLogin();
+          handleSignup();
         }}
       />
 
@@ -69,10 +85,10 @@ export default function LoginScreen({ navigation }) {
 
       <TouchableOpacity
         onPress={() => {
-          navigation.goBack();
+          navigation.navigate("Login");
         }}
       >
-        <Text>Don't have an account? Signup</Text>
+        <Text>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );
