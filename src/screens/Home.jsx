@@ -10,6 +10,8 @@ import { auth, db } from "../utils/firebase";
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
+import UploadImage from "../components/UploadImage";
+
 export default function HomeScreen({ navigation }) {
   const [userData, setUserData] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -53,6 +55,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <UploadImage />
+
       <Text>Home Screen</Text>
       <Text>{userData?.name}</Text>
 
